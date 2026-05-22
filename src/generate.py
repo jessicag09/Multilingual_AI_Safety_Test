@@ -23,7 +23,9 @@ def load_done(path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--backend", choices=["openrouter", "ollama"], required=True)
+    ap.add_argument("--backend", choices=["together", "openrouter", "ollama"], default="together")
+    ap.add_argument("--max-calls", type=int, default=None,
+                    help="cap new generations this run (resume picks up next time)")
     args = ap.parse_args()
 
     client = get_client(args.backend)
@@ -34,12 +36,16 @@ def main():
     done = load_done(config.RAW_RESPONSES)
     print(f"resuming: {len(done)} already done")
 
+    new_count = 0
     with open(config.RAW_RESPONSES, "a") as out:
         for model_key, model_id in config.MODELS.items():
             for row in tqdm(prompts, desc=model_key):
                 key = (model_key, int(row["prompt_id"]), row["language"])
                 if key in done:
                     continue
+                if args.max_calls is not None and new_count >= args.max_calls:
+                    print(f"\nhit --max-calls={args.max_calls}; stopping")
+                    return
                 try:
                     resp = client.generate(
                         model_id=model_id,
@@ -58,12 +64,12 @@ def main():
                     "prompt_id": int(row["prompt_id"]),
                     "language": row["language"],
                     "category": row["category"],
-                    "behavior_translated": row["behavior_translated"],
                     "prompt_text": row["prompt_text"],
                     "raw_response": resp,
                     "error": error,
                 }, ensure_ascii=False) + "\n")
                 out.flush()
+                new_count += 1
 
 
 if __name__ == "__main__":

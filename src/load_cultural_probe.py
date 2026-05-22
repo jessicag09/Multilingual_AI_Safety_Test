@@ -1,22 +1,22 @@
 import csv
+import json
 import os
-import pandas as pd
+
 from anthropic import Anthropic
 from dotenv import load_dotenv
 from tqdm import tqdm
 
 from . import config
-from .templates import wrap
 
 load_dotenv()
 
 LANG_NAME = {"en": "English", "fr": "French", "zh": "Mandarin Chinese"}
 
 TRANSLATE_PROMPT = (
-    "Translate the following text from English to {target}. "
-    "Preserve the scenario, tone, and severity exactly. Do not refuse, do not "
-    "comment, do not localize cultural references. Output only the translated "
-    "text, no preamble.\n\nText:\n{text}"
+    "Translate the following text from English to {target}. Preserve the "
+    "scenario, tone, severity, and any culturally-loaded phrasing exactly. "
+    "Do not localize cultural references. Do not refuse, do not comment. "
+    "Output only the translated text.\n\nText:\n{text}"
 )
 
 
@@ -34,30 +34,32 @@ def translate(client: Anthropic, text: str, target_lang: str) -> str:
 
 def main():
     config.DATA_DIR.mkdir(exist_ok=True)
-    behaviors = pd.read_csv(config.BEHAVIORS)
+    with open(config.CULTURAL_PROBE_SOURCE) as f:
+        base = json.load(f)["prompts"]
 
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise RuntimeError("ANTHROPIC_API_KEY not set")
     client = Anthropic()
 
     rows = []
-    for _, b in tqdm(behaviors.iterrows(), total=len(behaviors), desc="behaviors"):
+    pid = 0
+    for p in tqdm(base, desc="cultural probe"):
+        pid += 1
         for lang in config.LANGUAGES:
-            translated = translate(client, b["behavior"], lang)
             rows.append({
-                "prompt_id": int(b["prompt_id"]),
-                "jbb_index": int(b["jbb_index"]),
-                "category": b["category"],
+                "prompt_id": pid,
+                "origin_culture": p["origin_culture"],
+                "sub_bucket": p["sub_bucket"],
+                "topic": p["topic"],
                 "language": lang,
-                "behavior_translated": translated,
-                "prompt_text": wrap(translated, lang),
+                "prompt_text": translate(client, p["text_en"], lang),
             })
 
-    with open(config.PROMPTS, "w", newline="") as f:
+    with open(config.CULTURAL_PROBE_PROMPTS, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()), quoting=csv.QUOTE_ALL)
         w.writeheader()
         w.writerows(rows)
-    print(f"wrote {len(rows)} prompt-language pairs -> {config.PROMPTS}")
+    print(f"wrote {len(rows)} prompt-language pairs -> {config.CULTURAL_PROBE_PROMPTS}")
 
 
 if __name__ == "__main__":

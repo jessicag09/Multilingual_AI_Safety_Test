@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+data/raw_responses.jsonl
+data/prompts_180.csv
+data/results.csv
+data/toxicity.jsonl
+data/refusal.jsonl
+.DS_Store

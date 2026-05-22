@@ -9,6 +9,9 @@ class ModelClient(ABC):
 
 
 def get_client(backend: str) -> ModelClient:
+    if backend == "together":
+        from .together import TogetherClient
+        return TogetherClient()
     if backend == "openrouter":
         from .openrouter import OpenRouterClient
         return OpenRouterClient()
