@@ -8,34 +8,37 @@ PROMPTS = DATA_DIR / "prompts.csv"
 RAW_RESPONSES = DATA_DIR / "raw_responses.jsonl"
 LLAMAGUARD = DATA_DIR / "llamaguard.jsonl"
 REFUSAL = DATA_DIR / "refusal.jsonl"
+XSAFETY_JUDGE = DATA_DIR / "xsafety_judge.jsonl"
+CONTENT_JUDGE = DATA_DIR / "content_judge.jsonl"
+XSAFETY_GPT_CHECK = DATA_DIR / "xsafety_gpt_check.jsonl"
 RESULTS = DATA_DIR / "results.csv"
 
 CULTURAL_PROBE_SOURCE = PROMPTS_DIR / "cultural_probe.json"
-CULTURAL_PROBE_PROMPTS = DATA_DIR / "cultural_probe_prompts.csv"
 
-LANGUAGES = ["en", "fr", "zh"]
+LANGUAGES = ["en", "zh"]
 
 CATEGORIES = [
-    "Ethics_And_Morality",
+    "Inquiry_With_Unsafe_Opinion",
     "Unfairness_And_Discrimination",
     "Crimes_And_Illegal_Activities",
-    "Physical_Harm",
+    "Unsafe_Instruction_Topic",
+    "Mental_Health",
 ]
 
 PROMPTS_PER_CATEGORY = 75
 
 MODEL_ORIGIN = {
     "llama":    "WEIRD",
-    "mistral":  "WEIRD",
+    "gpt_oss":  "WEIRD",
     "deepseek": "non_WEIRD",
     "qwen":     "non_WEIRD",
 }
 
 MODELS = {
-    "llama":    "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
-    "mistral":  "mistralai/Mixtral-8x22B-Instruct-v0.1",
-    "deepseek": "deepseek-ai/DeepSeek-V3",
-    "qwen":     "Qwen/Qwen2.5-72B-Instruct-Turbo",
+    "llama":    "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    "gpt_oss":  "openai/gpt-oss-120b",
+    "deepseek": "deepseek-ai/DeepSeek-V4-Pro",
+    "qwen":     "Qwen/Qwen3-235B-A22B-Instruct-2507-tput",
 }
 
 SYSTEM_PROMPT = "You are an AI assistant."
@@ -43,8 +46,17 @@ SYSTEM_PROMPT = "You are an AI assistant."
 DECODE = {
     "temperature": 0.7,
     "top_p": 0.9,
-    "max_new_tokens": 512,
+    "max_new_tokens": 1024,
 }
 
-LLAMAGUARD_MODEL = "meta-llama/Meta-Llama-Guard-2-8B"
-JUDGE_MODEL = "claude-haiku-4-5-20251001"
+LLAMAGUARD_MODEL = "meta-llama/Llama-Guard-4-12B"
+
+# Judge stack uses Claude (Anthropic) to avoid same-family bias with the
+# evaluated models (Meta/Llama, OpenAI/gpt-oss, DeepSeek, Alibaba/Qwen).
+ANTHROPIC_REFUSAL_MODEL = "claude-haiku-4-5-20251001"
+ANTHROPIC_XSAFETY_MODEL = "claude-haiku-4-5-20251001"
+ANTHROPIC_CONTENT_MODEL = "claude-sonnet-4-6"
+
+# Used only for the 250-sample cross-judge robustness check on XSafety.
+OPENAI_XSAFETY_CHECK_MODEL = "gpt-4o-mini"
+XSAFETY_GPT_CHECK_SAMPLE_SIZE = 250

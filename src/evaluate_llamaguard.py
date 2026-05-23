@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import time
@@ -62,7 +63,23 @@ def classify(headers, user: str, agent: str) -> int:
             time.sleep(2 ** attempt)
 
 
+def load_done(path):
+    done = set()
+    if not path.exists():
+        return done
+    with open(path) as f:
+        for line in f:
+            r = json.loads(line)
+            done.add((r["model"], r["stimulus_set"], r["prompt_id"], r["language"]))
+    return done
+
+
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--max-calls", type=int, default=None,
+                    help="cap new judge calls this run (resume picks up next time)")
+    args = ap.parse_args()
+
     key = os.environ.get("TOGETHER_API_KEY")
     if not key:
         raise RuntimeError("TOGETHER_API_KEY not set")
@@ -71,16 +88,27 @@ def main():
     with open(config.RAW_RESPONSES) as f:
         rows = [json.loads(l) for l in f]
 
-    with open(config.LLAMAGUARD, "w") as out:
-        for r in tqdm(rows, desc="llamaguard"):
+    done = load_done(config.LLAMAGUARD)
+    pending = [r for r in rows
+               if (r["model"], r["stimulus_set"], r["prompt_id"], r["language"]) not in done]
+    print(f"total rows: {len(rows)} | already judged: {len(done)} | pending: {len(pending)}")
+
+    new_count = 0
+    with open(config.LLAMAGUARD, "a") as out:
+        for r in tqdm(pending, desc="llamaguard"):
+            if args.max_calls is not None and new_count >= args.max_calls:
+                print(f"\nhit --max-calls={args.max_calls}; stopping. Re-run to continue.")
+                return
             unsafe = classify(headers, r["prompt_text"], r["raw_response"] or "")
             out.write(json.dumps({
                 "model": r["model"],
+                "stimulus_set": r["stimulus_set"],
                 "prompt_id": r["prompt_id"],
                 "language": r["language"],
                 "llamaguard_unsafe": unsafe,
             }) + "\n")
-    print(f"wrote {len(rows)} -> {config.LLAMAGUARD}")
+            out.flush()
+            new_count += 1
 
 
 if __name__ == "__main__":

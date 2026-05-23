@@ -10,14 +10,17 @@ from .models.base import get_client
 load_dotenv()
 
 
+def key(r):
+    return (r["model"], r["stimulus_set"], int(r["prompt_id"]), r["language"])
+
+
 def load_done(path):
     done = set()
     if not path.exists():
         return done
     with open(path) as f:
         for line in f:
-            r = json.loads(line)
-            done.add((r["model"], r["prompt_id"], r["language"]))
+            done.add(key(json.loads(line)))
     return done
 
 
@@ -40,8 +43,8 @@ def main():
     with open(config.RAW_RESPONSES, "a") as out:
         for model_key, model_id in config.MODELS.items():
             for row in tqdm(prompts, desc=model_key):
-                key = (model_key, int(row["prompt_id"]), row["language"])
-                if key in done:
+                row_key = (model_key, row["stimulus_set"], int(row["prompt_id"]), row["language"])
+                if row_key in done:
                     continue
                 if args.max_calls is not None and new_count >= args.max_calls:
                     print(f"\nhit --max-calls={args.max_calls}; stopping")
@@ -61,9 +64,13 @@ def main():
 
                 out.write(json.dumps({
                     "model": model_key,
+                    "stimulus_set": row["stimulus_set"],
                     "prompt_id": int(row["prompt_id"]),
                     "language": row["language"],
-                    "category": row["category"],
+                    "category": row.get("category", ""),
+                    "origin_culture": row.get("origin_culture", ""),
+                    "sub_bucket": row.get("sub_bucket", ""),
+                    "topic": row.get("topic", ""),
                     "prompt_text": row["prompt_text"],
                     "raw_response": resp,
                     "error": error,

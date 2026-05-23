@@ -8,6 +8,11 @@ from . import config
 
 BASE = "https://raw.githubusercontent.com/Jarviswang94/Multilingual_safety_benchmark/main"
 
+COLUMNS = [
+    "stimulus_set", "prompt_id", "language", "prompt_text",
+    "category", "row_index", "origin_culture", "sub_bucket", "topic",
+]
+
 
 def filename(category: str, lang: str) -> str:
     if lang == "en":
@@ -36,17 +41,22 @@ def main():
             pid += 1
             for lang in config.LANGUAGES:
                 out.append({
+                    "stimulus_set": "xsafety",
                     "prompt_id": pid,
-                    "category": category,
-                    "row_index": row_idx,
                     "language": lang,
                     "prompt_text": per_lang[lang][row_idx],
+                    "category": category,
+                    "row_index": row_idx,
+                    "origin_culture": "",
+                    "sub_bucket": "",
+                    "topic": "",
                 })
         print(f"{category}: took {take} / {n_aligned} aligned rows")
 
-    df = pd.DataFrame(out)
+    df = pd.DataFrame(out, columns=COLUMNS)
     df.to_csv(config.PROMPTS, index=False, quoting=csv.QUOTE_ALL)
-    print(f"wrote {len(df)} prompt-language pairs -> {config.PROMPTS}")
+    print(f"wrote {len(df)} XSafety prompt-language pairs -> {config.PROMPTS}")
+    print("To also include the cultural probe, now run: python -m src.load_cultural_probe")
 
 
 if __name__ == "__main__":

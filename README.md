@@ -1,14 +1,15 @@
 # Cross-Cultural Safety Evaluation of Open-Source LLMs: A WEIRD-Framed Study
 
-Tests whether the cultural origin of an open-source LLM produces measurable
-differences in its safety behavior across response languages, using XSafety's
-aligned multilingual prompts.
+Tests whether the **alignment-decision jurisdiction** of an open-source LLM
+(WEIRD vs non-WEIRD) produces measurable differences in safety behavior and
+advice framing across response languages, using XSafety's aligned multilingual
+prompts plus a custom cultural-norm probe.
 
-Anchored in Henrich's WEIRD framework: safety alignment has been developed
-primarily in WEIRD institutional contexts; Chinese-origin models are trained
-under different regulatory and corpus conditions. This study tests whether
-origin effects appear, persist across languages, and survive a deliberately
-neutralized benchmark.
+Anchored in Henrich's WEIRD framework: AI alignment is developed under
+particular institutional/regulatory contexts. Western labs (Meta, OpenAI) make
+alignment decisions in SF under US norms; Chinese labs (DeepSeek, Alibaba)
+operate under the 2023 Generative AI Measures. This study tests whether those
+divergent contexts produce measurably different safety behavior.
 
 ## Design
 
@@ -16,74 +17,72 @@ neutralized benchmark.
 
 | Origin | Model |
 |---|---|
-| WEIRD (Meta, US) | `meta-llama/Meta-Llama-3-70B-Instruct-Turbo` |
-| WEIRD (Mistral AI, France) | `mistralai/Mixtral-8x22B-Instruct-v0.1` |
-| non-WEIRD (DeepSeek, China) | `deepseek-ai/DeepSeek-V3` |
-| non-WEIRD (Alibaba, China) | `Qwen/Qwen2.5-72B-Instruct-Turbo` |
+| WEIRD (Meta, US) | `meta-llama/Llama-3.3-70B-Instruct-Turbo` |
+| WEIRD (OpenAI, US) | `openai/gpt-oss-120b` |
+| non-WEIRD (DeepSeek, China) | `deepseek-ai/DeepSeek-V4-Pro` |
+| non-WEIRD (Alibaba, China) | `Qwen/Qwen3-235B-A22B-Instruct-2507-tput` |
 
-All four served via Together AI. Capability-tier matching is imperfect and
-documented as a limitation.
+All four served via Together AI serverless.
 
-**3 languages:** en, fr, zh — aligned to model origins, professionally
-translated by XSafety (no in-pipeline translation).
+**2 languages:** en, zh (French dropped after Mistral was removed from the
+lineup — Together no longer hosts serverless Mistral and OpenAI's gpt-oss
+became the second WEIRD model).
 
-**4 XSafety categories, each chosen for a theoretical role:**
+**5 XSafety categories**, chosen for safety stress-testing power + cultural-substrate signal:
 
 | Category | Role |
 |---|---|
-| `Ethics_And_Morality` | Primary WEIRD-effect target — moral norms vary most across cultures |
-| `Unfairness_And_Discrimination` | Cultural variation in what counts as discrimination (caste, hukou, laïcité, affirmative action) |
-| `Crimes_And_Illegal_Activities` | Legal/regulatory variation across jurisdictions |
-| `Physical_Harm` | Universal taboo — control category |
+| `Inquiry_With_Unsafe_Opinion` | Premise-baited questions — tests pushback on harmful framings |
+| `Unfairness_And_Discrimination` | Mixed: baited discriminatory statements + value-laden questions |
+| `Crimes_And_Illegal_Activities` | Direct first-person criminal requests — tests refusal |
+| `Unsafe_Instruction_Topic` | Direct harm-action requests |
+| `Mental_Health` | First-person distress prompts — substrate-loaded advice domain |
 
-**Stimuli:** 75 prompts per category × 4 categories × 3 languages = 900
-prompt-language pairs per model. Identical row indices sampled across
-languages so the language axis is isolated from prompt-selection noise.
+75 prompts per category × 5 categories × 2 languages = **750 XSafety prompt-language pairs per model**.
 
-**Total: 900 × 4 models = 3,600 generations.**
+**Cultural probe** (`prompts/cultural_probe.json`) — custom non-political stimulus set, archetype-matched:
+- **7 archetype-matched pairs** (7 US + 7 CN value-laden cultural-norm prompts)
+- Each pair shares life domain, stakes, and discourse act so cross-origin differences reflect substrate framing, not prompt severity
+- All translations hardcoded in the JSON (no runtime translator)
+- 14 × 2 languages = **28 cultural probe prompt-language pairs per model**
+- See `prompts/cultural_probe.json` `_construction_notes` for the Path D
+  rationale (political_taboo excluded due to asymmetric regulatory environments)
 
-## Cultural probe (custom stimulus set)
+**Totals:** (750 XSafety + 28 cultural probe) × 4 models = **3,112 generations**.
 
-Separate from XSafety. Tests whether origin effects persist on
-culturally-loaded prompts that XSafety's neutralization removes.
+## Judges (4 — different model families for independence)
 
-- **45 base prompts**: 15 per origin culture (US / FR / CN)
-- Each origin split into two sub-buckets:
-  - **`political_taboo`** (5 per origin): Tiananmen, Xinjiang, January 6, abortion, laïcité, etc. — tests political-alignment behavior
-  - **`cultural_norm`** (10 per origin): gift-giving, filial piety, lunch length, hukou, etc. — tests cultural-substrate effects on politically-neutral content
-- Each base prompt translated to en/fr/zh → 135 prompt-language pairs
-- 135 × 4 models = **540 additional generations**
+| Judge | Model | API | Output | Why this model |
+|---|---|---|---|---|
+| Harm | `meta-llama/Llama-Guard-4-12B` | Together | `llamaguard_unsafe ∈ {0,1}` | Standard harm classifier |
+| Refusal | `claude-haiku-4-5` | Anthropic | `refusal ∈ {0,1}` | No family overlap with eval models |
+| XSafety-style | `claude-haiku-4-5` | Anthropic | `xsafety_unsafe ∈ {0,1}` | Same — no family overlap |
+| Content/framing | `claude-sonnet-4-6` | Anthropic | structured: stance, **individual_framing (1-5), collectivist_framing (1-5)**, recommendation, tone, framing_notes, refused | Captures substrate signal in advice content; two independent framing axes |
 
-Source file: [`prompts/cultural_probe.json`](prompts/cultural_probe.json).
-Loaded via `python -m src.load_cultural_probe` (translates with Claude
-Haiku and emits `data/cultural_probe_prompts.csv`).
+**Why Claude, not gpt-4o-mini?** gpt-4o-mini shares OpenAI's training/safety
+substrate with gpt-oss-120b in the eval set — same-family-bias risk. Claude
+(Anthropic) has no family overlap with any of the four evaluated models.
 
-**Status**: I scaffolded the JSON with all 45 prompts as a starting draft.
-**You should review and edit these before running** — they are bias-prone
-by their nature, and the original study design calls for native-speaker
-review of the translations as well.
-
-## Judges (both run)
-
-| Judge | Output | Why |
-|---|---|---|
-| **Llama-Guard-2-8B** (via Together) | `llamaguard_unsafe ∈ {0,1}` | Standard harm classifier |
-| **Claude Haiku** | `refusal ∈ {0,1}` | Refusal != harmlessness. Also multilingual cross-check for Llama-Guard's English bias |
-
-**Why not Llama-3-70B as judge** (as in the original design): Llama-3 is one
-of the four evaluated models. Same-family self-judgment is a confound.
+**Robustness check:** `evaluate_xsafety_gpt_check.py` re-scores a 250-sample
+random subset of XSafety rows with `gpt-4o-mini` using the same XSafety prompt.
+Reported as Claude/GPT agreement (raw + Cohen's kappa) in `analyze.py`.
 
 ## Layout
 
 ```
-src/config.py               4 models, 4 categories, n=75, MODEL_ORIGIN map
-src/models/                 swappable backends (Together is the default)
-src/load_xsafety.py         download XSafety CSVs aligned across en/fr/zh -> data/prompts.csv
-src/generate.py             3,600 generations -> data/raw_responses.jsonl  (--max-calls N to cap)
-src/evaluate_llamaguard.py  Llama-Guard-2-8B via Together -> data/llamaguard.jsonl
-src/evaluate_refusal.py     Claude yes/no refusal judge   -> data/refusal.jsonl
-src/build_dataset.py        merge into final CSV          -> data/results.csv
-src/analyze.py              origin × language ANOVA tables, within-origin clustering, plots
+prompts/cultural_probe.json    14 custom cultural-norm prompts (7 matched pairs), en/zh hardcoded
+src/config.py                  paths, MODEL_ORIGIN, categories, judge models
+src/models/                    swappable generation backends (Together default)
+src/load_xsafety.py            writes XSafety rows -> data/prompts.csv
+src/load_cultural_probe.py     appends cultural probe rows -> data/prompts.csv
+src/generate.py                runs generations -> data/raw_responses.jsonl  (--max-calls N)
+src/evaluate_llamaguard.py     harm classification via Together         -> llamaguard.jsonl
+src/evaluate_refusal.py        refusal judge via Claude Haiku           -> refusal.jsonl
+src/evaluate_xsafety.py        XSafety-paper-style judge via Claude Haiku -> xsafety_judge.jsonl
+src/evaluate_xsafety_gpt_check.py  GPT cross-check on 250 XSafety rows  -> xsafety_gpt_check.jsonl
+src/evaluate_content.py        content/framing analyzer via Claude Sonnet -> content_judge.jsonl
+src/build_dataset.py           merge all judges -> data/results.csv
+src/analyze.py                 RQ1-RQ4 tables, plots, content-judge breakdowns
 ```
 
 ## Setup
@@ -91,70 +90,96 @@ src/analyze.py              origin × language ANOVA tables, within-origin clust
 ```
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env    # fill in TOGETHER_API_KEY and ANTHROPIC_API_KEY
+cp .env.example .env    # fill in TOGETHER_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY
 ```
+
+**API keys required:**
+- `TOGETHER_API_KEY` — generation (4 models) + Llama-Guard
+- `ANTHROPIC_API_KEY` — refusal, XSafety-style, and content judges
+- `OPENAI_API_KEY` — GPT cross-check only (~250 calls)
 
 ## Pipeline
 
 ```
+# Build the prompt set (both stimulus conditions):
 python -m src.load_xsafety
-python -m src.generate                          # full run
-# or:  python -m src.generate --max-calls 30    # pilot, ~$0.20
-python -m src.evaluate_llamaguard
-python -m src.evaluate_refusal
+python -m src.load_cultural_probe
+
+# Generate responses (resumes if interrupted; --max-calls N to cap a run):
+python -m src.generate --backend together
+
+# Score every response with the four judges:
+python -m src.evaluate_llamaguard            # Together  ~15 min
+python -m src.evaluate_refusal               # Claude    ~30 min
+python -m src.evaluate_xsafety               # Claude    ~30 min
+python -m src.evaluate_xsafety_gpt_check     # OpenAI    ~3  min  (250 samples)
+python -m src.evaluate_content               # Claude    ~45 min  (Sonnet, on all rows)
+
+# Build the merged dataset and run the analysis:
 python -m src.build_dataset
 python -m src.analyze
 ```
 
-`generate.py` resumes from `raw_responses.jsonl` if interrupted.
+All judges resume from their own JSONL output files. The full-run judges support
+`--max-calls N`; the GPT XSafety cross-check instead uses `--n` to set sample size.
+
+If you only want the XSafety condition, skip `load_cultural_probe`. Analysis
+auto-detects which stimulus sets and which judges are present.
 
 ## Cost estimate
 
 | Step | Calls | Approx cost |
 |---|---|---|
-| Generate (4 models × 900 prompt-lang pairs each) | 3,600 | ~$15-25 (Together) |
-| Llama-Guard | 3,600 | ~$1 |
-| Claude refusal judge | 3,600 | ~$1 |
-| **Total** | | **~$17-27** |
+| Generation (4 models × 778 prompt-lang pairs) | 3,112 | ~$4-6 (Together) |
+| Llama-Guard judging | 3,112 | ~$0.50 (Together) |
+| Claude Haiku refusal | 3,112 | ~$1-2 (Anthropic) |
+| Claude Haiku XSafety-style | 3,112 | ~$1-2 (Anthropic) |
+| Claude Sonnet content analyzer | 3,112 | ~$6-10 (Anthropic) |
+| GPT-4o-mini XSafety cross-check | 250 | ~$0.05 (OpenAI) |
+| **Total** | | **~$13-21** |
 
-## Research questions (pre-registered prediction patterns)
+## Research questions
 
-- **RQ1 — Replication**: do open-weight LLMs reproduce XSafety's finding of
-  degraded safety in non-English languages?
-- **RQ2 — Origin × Language interaction**: do non-WEIRD models behave
-  differently on Mandarin than WEIRD models? Does Mistral handle French
-  differently than Llama does?
-- **RQ3 — Within-origin clustering**: do DeepSeek and Qwen pattern together
-  (origin effect) or differ (model-specific effect)?
-- **RQ4 — Benchmark neutrality vs. origin**: does XSafety's deliberate
-  neutralization suppress origin effects, or do they persist?
-
-The four prediction patterns (origin wins / benchmark wins / mixed by
-category / null) are all interpretable, so results are not only confirmatory.
+1. **Replication** — do open-source LLMs degrade in safety on non-English languages, as XSafety found?
+2. **Origin × Language interaction** — do Chinese-origin models respond differently in Mandarin than Western-origin models do in their native languages?
+3. **Within-origin clustering** — do same-origin models pattern together (origin effect) or diverge (model-specific effect)?
+4. **Neutralization vs. cultural loading** — does XSafety's neutralization suppress origin effects, or do they persist (and amplify) on the cultural probe?
 
 ## Statistical plan
 
-- Two-way ANOVA (origin × language), category as repeated factor → main
-  effects + interaction
-- Within-origin pairwise: DeepSeek vs Qwen; Llama vs Mistral
-- Logistic mixed model (origin × language × category fixed, model random)
-  is cleaner for the binary outcome — recommended for the final writeup
+`analyze.py` outputs cell-mean tables, plots, and CSVs covering:
+- Refusal and unsafe rates by model × language × stimulus_set
+- WEIRD vs non-WEIRD origin contrasts
+- Within-origin clustering tables
+- Content-analyzer breakdowns (stance, individual/collectivist framing, recommendation, tone, framing notes)
+- Cross-judge agreement (Llama-Guard vs Claude refusal vs Claude XSafety-style)
+- Claude/GPT XSafety-judge agreement on the 250-sample robustness check
 
-## Limitations (build into writeup)
+Inferential tests (two-way ANOVA origin × language; logistic mixed model
+origin × language × category fixed, model random) are run at writeup time
+from `data/results.csv` in a notebook — not inside `analyze.py`.
 
-- **n=2 per origin** — within-origin clustering is suggestive, not
-  conclusive
-- **Cohort confound** — DeepSeek-V3 (Dec 2024) is newer than Llama-3
-  (Apr 2024); origin-vs-recency is partially confounded
-- **Capability-tier matching** is imperfect across families
-- **Llama-Guard is primarily English-trained** — judge-disagreement
-  analysis is the cross-check
-- **No causal attribution** to specific training/regulatory factors; the
-  study documents patterns
+## Limitations
+
+- **n=2 per origin cluster** — within-origin clustering is suggestive, not conclusive
+- **Cohort confound** — DeepSeek-V4-Pro is newer than Llama-3.3-70B; origin vs training-cohort recency partially confounded
+- **Capability-tier matching** is imperfect across model families
+- **Llama-Guard-4 is primarily English-trained** — scores on Mandarin responses are noisier; multi-judge design and content analyzer are the cross-checks
+- **XSafety has a built-in worldview** — many prompts (especially in Unfairness_And_Discrimination) are constructed such that the "safe" response aligns with a particular value framework. XSafety refusal/safe-rates therefore partially measure agreement with the benchmark's underlying perspective, not pure safety behavior. Our cultural probe is designed to be more value-neutral, and the content analyzer captures framing differences that don't require any particular value framework to score
+- **Cultural probe** authored by a single researcher; native-speaker review of translations is the QC step (status: pending)
+- **Subsampled XSafety** (75/200 per category, deterministic first-N)
+- **Path D scoping** — political_taboo sub-bucket dropped because regulatory environments are asymmetric (China's GAI Measures vs no US parallel); symmetric political probing left to future work
+- **No causal attribution** to specific training/regulatory factors — only document patterns
+- **No policy recommendation** — descriptive contribution only; normative questions outside this study's scope
 
 ## Positioning
 
 Extension of XL-SafetyBench (Anonymous 2026) along three axes:
 1. open-source models from culturally-distinct origins, not frontier closed models
 2. Mandarin coverage (XL-SafetyBench omits Chinese)
-3. explicit WEIRD framing to make the cultural-substrate hypothesis falsifiable
+3. explicit WEIRD framing of *alignment-decision jurisdiction* (not training data
+   or annotator demographics) to make the cultural-substrate hypothesis falsifiable
+
+The cultural-norm probe sits alongside XSafety as a deliberate culturally-loaded
+counterpart. RQ4 contrasts the two conditions directly. The content analyzer
+catches substrate signal in advice framing that binary judges miss.
