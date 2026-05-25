@@ -1,0 +1,5 @@
+model,CN,US
+deepseek,1.0,0.938
+qwen,1.0,0.938
+llama,0.562,0.533
+gpt_oss,0.875,0.75

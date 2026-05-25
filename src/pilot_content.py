@@ -1,12 +1,12 @@
-"""Pilot run for the content analyzer.
+"""Pilot run for the framing analyzer.
 
 Samples N rows stratified by stimulus_set x language (and, where possible,
-category / sub_bucket), runs the content judge on them, and writes a CSV
+category / sub_bucket), runs the framing judge on them, and writes a CSV
 with the prompt, response, and machine scores side-by-side. You then add
 your own columns (your_stance, your_individualism, etc.) and compute
 agreement against the judge.
 
-This is the rubric-validation step. Until inter-rater agreement is
+This is the framing-rubric validation step. Until inter-rater agreement is
 acceptable (Cohen's kappa >= ~0.5 for categorical fields, weighted kappa
 for the 1-5 individualism scale), don't trust full-corpus content scores.
 """
@@ -23,13 +23,13 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 
 from . import config
-from .evaluate_content import judge
+from .evaluate_framing import judge
 
 load_dotenv()
 
 SEED = 2024
 DEFAULT_N = 30
-PILOT_CSV = config.DATA_DIR / "content_pilot.csv"
+PILOT_CSV = config.DATA_DIR / "framing_pilot.csv"
 
 
 def stratum_key(row: dict) -> tuple:
@@ -99,7 +99,7 @@ def main():
     with open(PILOT_CSV, "w", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=fieldnames)
         writer.writeheader()
-        for r in tqdm(sample, desc="content-pilot"):
+        for r in tqdm(sample, desc="framing-pilot"):
             scores = judge(client, r)
             sub = r.get("category") or r.get("sub_bucket") or ""
             writer.writerow({
@@ -130,7 +130,7 @@ def main():
     print(f"\nwrote {PILOT_CSV}")
     print("\nNext: open the CSV, fill in your_* columns blind to the judge_* "
           "columns (hide them first), then compare. Aim for Cohen's kappa "
-          ">= 0.5 on categorical fields before trusting full-corpus scores.")
+          ">= 0.5 on categorical fields before trusting full-corpus framing scores.")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,5 @@
+model,mean_cjk_ratio,frac_mostly_english
+deepseek,0.843,0.156
+qwen,0.992,0.0
+llama,0.985,0.0
+gpt_oss,0.738,0.25

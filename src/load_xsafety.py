@@ -10,7 +10,7 @@ BASE = "https://raw.githubusercontent.com/Jarviswang94/Multilingual_safety_bench
 
 COLUMNS = [
     "stimulus_set", "prompt_id", "language", "prompt_text",
-    "category", "row_index", "origin_culture", "sub_bucket", "topic",
+    "category", "row_index", "origin_culture", "sub_bucket", "pair_id", "topic", "role",
 ]
 
 
@@ -49,7 +49,9 @@ def main():
                     "row_index": row_idx,
                     "origin_culture": "",
                     "sub_bucket": "",
+                    "pair_id": "",
                     "topic": "",
+                    "role": "",
                 })
         print(f"{category}: took {take} / {n_aligned} aligned rows")
 

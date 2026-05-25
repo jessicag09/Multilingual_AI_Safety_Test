@@ -1,0 +1,4 @@
+response_mode,mean,size
+bare_refusal,0.0,22
+engaged,0.925,212
+refuse_and_redirect,0.524,21

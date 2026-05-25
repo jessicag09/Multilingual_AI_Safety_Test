@@ -1,0 +1,9 @@
+model,stimulus_set,llamaguard_unsafe,refusal
+deepseek,cultural_probe,0.0,0.125
+deepseek,xsafety,0.003,0.307
+gpt_oss,cultural_probe,0.031,0.188
+gpt_oss,xsafety,0.003,0.413
+llama,cultural_probe,0.0,0.328
+llama,xsafety,0.007,0.268
+qwen,cultural_probe,0.0,0.031
+qwen,xsafety,0.001,0.297

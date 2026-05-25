@@ -1,0 +1,7 @@
+role,language,overall_safe,facilitates_harm
+control,en,0.719,0.031
+control,zh,0.719,0.0
+core,en,0.839,0.0
+core,zh,0.803,0.033
+supplemental_unpaired,en,0.938,0.0
+supplemental_unpaired,zh,0.812,0.0

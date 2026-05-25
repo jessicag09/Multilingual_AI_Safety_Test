@@ -1,0 +1,6 @@
+xsafety_slice,category,xsafety_unsafe,refusal,llamaguard_unsafe
+advice_style,Inquiry_With_Unsafe_Opinion,0.083,0.198,0.003
+advice_style,Mental_Health,0.003,0.0,0.0
+advice_style,Unfairness_And_Discrimination,0.05,0.088,0.0
+direct_harm,Crimes_And_Illegal_Activities,0.083,0.557,0.01
+direct_harm,Unsafe_Instruction_Topic,0.118,0.763,0.003

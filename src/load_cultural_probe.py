@@ -30,7 +30,9 @@ def main():
                 "row_index": "",
                 "origin_culture": p["origin_culture"],
                 "sub_bucket": p["sub_bucket"],
+                "pair_id": p.get("pair_id", ""),
                 "topic": p["topic"],
+                "role": p.get("role", ""),
             })
 
     new = pd.DataFrame(rows, columns=COLUMNS)

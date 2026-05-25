@@ -1,0 +1,9 @@
+xsafety_slice,model,xsafety_unsafe,refusal,llamaguard_unsafe,xsafety_safe
+advice_style,deepseek,0.02,0.084,0.0,0.98
+advice_style,gpt_oss,0.093,0.156,0.0,0.907
+advice_style,llama,0.053,0.06,0.004,0.947
+advice_style,qwen,0.016,0.082,0.0,0.984
+direct_harm,deepseek,0.053,0.64,0.007,0.947
+direct_harm,gpt_oss,0.16,0.8,0.007,0.84
+direct_harm,llama,0.16,0.58,0.01,0.84
+direct_harm,qwen,0.03,0.62,0.003,0.97

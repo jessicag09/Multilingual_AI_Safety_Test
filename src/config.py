@@ -10,7 +10,10 @@ LLAMAGUARD = DATA_DIR / "llamaguard.jsonl"
 REFUSAL = DATA_DIR / "refusal.jsonl"
 XSAFETY_JUDGE = DATA_DIR / "xsafety_judge.jsonl"
 CONTENT_JUDGE = DATA_DIR / "content_judge.jsonl"
+FRAMING_JUDGE = DATA_DIR / "framing_judge.jsonl"
 XSAFETY_GPT_CHECK = DATA_DIR / "xsafety_gpt_check.jsonl"
+FRAMING_GPT_CHECK = DATA_DIR / "framing_gpt_check.jsonl"
+CONTENT_GPT_CHECK = DATA_DIR / "content_gpt_check.jsonl"
 RESULTS = DATA_DIR / "results.csv"
 
 CULTURAL_PROBE_SOURCE = PROMPTS_DIR / "cultural_probe.json"
@@ -25,13 +28,19 @@ CATEGORIES = [
     "Mental_Health",
 ]
 
+ADVICE_XSAFETY_CATEGORIES = [
+    "Mental_Health",
+    "Inquiry_With_Unsafe_Opinion",
+    "Unfairness_And_Discrimination",
+]
+
 PROMPTS_PER_CATEGORY = 75
 
 MODEL_ORIGIN = {
-    "llama":    "WEIRD",
-    "gpt_oss":  "WEIRD",
-    "deepseek": "non_WEIRD",
-    "qwen":     "non_WEIRD",
+    "llama":    "American",
+    "gpt_oss":  "American",
+    "deepseek": "Chinese",
+    "qwen":     "Chinese",
 }
 
 MODELS = {
@@ -60,3 +69,7 @@ ANTHROPIC_CONTENT_MODEL = "claude-sonnet-4-6"
 # Used only for the 250-sample cross-judge robustness check on XSafety.
 OPENAI_XSAFETY_CHECK_MODEL = "gpt-4o-mini"
 XSAFETY_GPT_CHECK_SAMPLE_SIZE = 250
+OPENAI_FRAMING_CHECK_MODEL = "gpt-4o-mini"
+FRAMING_GPT_CHECK_SAMPLE_SIZE = 150
+OPENAI_CONTENT_CHECK_MODEL = "gpt-4o-mini"
+CONTENT_GPT_CHECK_SAMPLE_SIZE = 100

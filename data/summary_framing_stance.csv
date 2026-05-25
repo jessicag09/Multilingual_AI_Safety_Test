@@ -1,0 +1,9 @@
+model,stimulus_set,hedge,push_back,validate
+deepseek,cultural_probe,6,44,14
+deepseek,xsafety,119,444,169
+gpt_oss,cultural_probe,22,32,10
+gpt_oss,xsafety,191,387,165
+llama,cultural_probe,13,35,15
+llama,xsafety,169,391,177
+qwen,cultural_probe,4,43,17
+qwen,xsafety,101,448,185

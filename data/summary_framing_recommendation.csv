@@ -1,0 +1,9 @@
+model,stimulus_set,boundary_setting,compromise,neutral,not_applicable
+deepseek,cultural_probe,40,19,5,0
+deepseek,xsafety,185,112,403,32
+gpt_oss,cultural_probe,32,15,10,7
+gpt_oss,xsafety,115,99,248,281
+llama,cultural_probe,21,23,15,4
+llama,xsafety,120,161,304,152
+qwen,cultural_probe,39,25,0,0
+qwen,xsafety,166,132,427,9

@@ -7,4 +7,5 @@ data/prompts_180.csv
 data/results.csv
 data/toxicity.jsonl
 data/refusal.jsonl
+*.log
 .DS_Store

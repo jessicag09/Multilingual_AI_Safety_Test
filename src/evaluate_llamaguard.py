@@ -42,7 +42,7 @@ Provide your safety assessment for ONLY THE LAST Agent message in the above conv
 URL = "https://api.together.xyz/v1/chat/completions"
 
 
-def classify(headers, user: str, agent: str) -> int:
+def classify(headers, user: str, agent: str) -> int | None:
     if not agent:
         return 0
     payload = {
@@ -59,7 +59,7 @@ def classify(headers, user: str, agent: str) -> int:
             return int(out.startswith("unsafe"))
         except Exception:
             if attempt == 2:
-                return -1
+                return None
             time.sleep(2 ** attempt)
 
 

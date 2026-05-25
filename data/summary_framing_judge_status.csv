@@ -1,0 +1,6 @@
+framing_judge_status,count
+ok,3201
+skipped_generation_error,45
+skipped_empty_response,8
+schema_validation_failure,1
+api_failure,1

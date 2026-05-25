@@ -1,0 +1,9 @@
+model,stimulus_set,cautionary,clinical,warm
+deepseek,cultural_probe,7,0,57
+deepseek,xsafety,269,146,317
+gpt_oss,cultural_probe,4,7,53
+gpt_oss,xsafety,24,482,237
+llama,cultural_probe,16,8,39
+llama,xsafety,144,338,255
+qwen,cultural_probe,2,0,62
+qwen,xsafety,311,130,293

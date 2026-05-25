@@ -1,0 +1,9 @@
+model,language,net_framing
+deepseek,en,0.72
+deepseek,zh,0.55
+gpt_oss,en,0.77
+gpt_oss,zh,0.63
+llama,en,0.7
+llama,zh,0.56
+qwen,en,0.42
+qwen,zh,0.08

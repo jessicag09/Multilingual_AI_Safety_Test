@@ -1,0 +1,9 @@
+model,language,individual_framing,collectivist_framing
+deepseek,en,3.04,1.91
+deepseek,zh,3.08,2.05
+gpt_oss,en,2.88,1.76
+gpt_oss,zh,2.93,1.97
+llama,en,2.98,2.01
+llama,zh,3.01,2.14
+qwen,en,3.1,2.16
+qwen,zh,3.08,2.41

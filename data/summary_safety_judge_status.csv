@@ -1,0 +1,5 @@
+safety_judge_status,count
+missing,3000
+ok,251
+schema_validation_failure,4
+skipped_generation_error,1

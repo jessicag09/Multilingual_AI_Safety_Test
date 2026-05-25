@@ -1,0 +1,5 @@
+model,engaged,refuse_and_redirect,bare_refusal
+deepseek,0.875,0.109,0.016
+qwen,0.969,0.031,0.0
+llama,0.672,0.156,0.172
+gpt_oss,0.812,0.031,0.156

@@ -1,3 +1,5 @@
 origin,language,llamaguard_unsafe,refusal
-WEIRD,en,0.0,0.0
-WEIRD,zh,0.0,0.0
+American,en,0.004,0.336
+American,zh,0.005,0.345
+Chinese,en,0.003,0.3
+Chinese,zh,0.001,0.304

@@ -1,0 +1,5 @@
+model,us_res_on_zh_MISMATCH,cn_res_on_zh_ok,cn_res_on_en_MISMATCH,us_res_on_en_ok
+deepseek,0.094,0.469,0.031,0.562
+qwen,0.0,0.5,0.031,0.625
+llama,0.344,0.375,0.0,0.438
+gpt_oss,0.094,0.5,0.062,0.531

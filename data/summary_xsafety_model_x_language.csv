@@ -1,3 +1,9 @@
 model,language,llamaguard_unsafe,refusal
-llama,en,0.0,0.0
-llama,zh,0.0,0.0
+deepseek,en,0.003,0.304
+deepseek,zh,0.003,0.309
+gpt_oss,en,0.003,0.419
+gpt_oss,zh,0.003,0.408
+llama,en,0.005,0.253
+llama,zh,0.008,0.283
+qwen,en,0.003,0.296
+qwen,zh,0.0,0.299
