@@ -1,0 +1,9 @@
+context,model,engaged,refuse_and_redirect,bare_refusal
+xsafety_advice_style,deepseek,0.916,0.027,0.058
+xsafety_advice_style,qwen,0.918,0.027,0.056
+xsafety_advice_style,llama,0.94,0.0,0.06
+xsafety_advice_style,gpt_oss,0.844,0.0,0.156
+cultural_probe_nonharmful,deepseek,1.0,0.0,0.0
+cultural_probe_nonharmful,qwen,1.0,0.0,0.0
+cultural_probe_nonharmful,llama,1.0,0.0,0.0
+cultural_probe_nonharmful,gpt_oss,0.976,0.024,0.0

@@ -13,6 +13,13 @@ SAFETY_COLS = ["risk_level", "recognizes_risk", "facilitates_harm",
                "appropriate_escalation", "supportive_tone", "protective_guidance",
                "overall_safe", "failure_notes",
                "refused", "parse_ok", "judge_status", "judge_error"]
+SAFETY_V2_COLS = [
+    "rubric_version", "prompt_type", "response_mode", "resource_localization",
+    "risk_level", "recognizes_risk", "facilitates_harm",
+    "appropriate_escalation", "supportive_tone", "protective_guidance",
+    "overall_safe", "failure_notes",
+    "refused", "parse_ok", "judge_status", "judge_error",
+]
 FRAMING_COLS = ["stance", "individual_framing", "collectivist_framing",
                 "recommendation", "tone", "framing_notes",
                 "refused", "parse_ok", "judge_status", "judge_error"]
@@ -29,6 +36,7 @@ CONTENT_GPT_CHECK_COLS = [
     "content_gpt_refused", "content_gpt_overall_safe", "content_gpt_parse_ok",
     "content_gpt_judge_status", "content_gpt_judge_error",
 ]
+CONTENT_GPT_CHECK_V2_COLS = SAFETY_V2_COLS[:]
 # Columns both judges share — prefixed per judge so they don't collide in results.csv.
 SHARED_JUDGE_COLS = {"refused", "parse_ok", "judge_status", "judge_error"}
 
@@ -67,6 +75,31 @@ def merge_optional(df, path, cols):
         if c not in df.columns:
             df[c] = pd.NA
     return df, avail
+
+
+def merge_optional_prefixed(df, path, cols, prefix):
+    """Left-merge a generic optional output on KEYS and prefix every merged column.
+
+    Used for versioned judge/check outputs so v1 and v2 can coexist in
+    results.csv without collisions.
+    """
+    prefixed = [prefix + c for c in cols]
+    if not path.exists():
+        for c in prefixed:
+            if c not in df.columns:
+                df[c] = pd.NA
+        return df, []
+    j, dup_count = read_judge_jsonl(path)
+    avail = [c for c in cols if c in j.columns]
+    renamed = {c: prefix + c for c in avail}
+    if avail:
+        df = df.merge(j[KEYS + avail].rename(columns=renamed), on=KEYS, how="left")
+    if dup_count:
+        print(f"warning: deduped {dup_count} duplicate judge rows in {path.name}")
+    for c in prefixed:
+        if c not in df.columns:
+            df[c] = pd.NA
+    return df, [prefix + c for c in avail]
 
 
 def merge_judge(df, path, cols, prefix):
@@ -135,9 +168,19 @@ def main():
     df, content_gpt_added = merge_optional(df, config.CONTENT_GPT_CHECK, CONTENT_GPT_CHECK_COLS)
     out_cols.extend(CONTENT_GPT_CHECK_COLS)
 
+    # Content GPT cross-check v2 (gpt-4o-mini, sampled subset) — optional
+    df, content_gpt_v2_added = merge_optional_prefixed(
+        df, config.CONTENT_GPT_CHECK_V2, CONTENT_GPT_CHECK_V2_COLS, "content_gpt_v2_"
+    )
+    out_cols.extend(["content_gpt_v2_" + c for c in CONTENT_GPT_CHECK_V2_COLS])
+
     # Adolescent safety judge -> content_judge.jsonl (cultural_probe only).
     df, safety_added = merge_judge(df, config.CONTENT_JUDGE, SAFETY_COLS, "safety_")
     out_cols.extend(safety_added)
+
+    # Adolescent safety judge v2 -> content_judge_v2.jsonl (cultural_probe only).
+    df, safety_v2_added = merge_optional_prefixed(df, config.CONTENT_JUDGE_V2, SAFETY_V2_COLS, "safety_v2_")
+    out_cols.extend(["safety_v2_" + c for c in SAFETY_V2_COLS])
 
     # Framing judge -> framing_judge.jsonl (all rows).
     df, framing_added = merge_judge(df, config.FRAMING_JUDGE, FRAMING_COLS, "framing_")
@@ -160,7 +203,11 @@ def main():
         print("framing GPT check columns:", framing_gpt_added)
     if content_gpt_added:
         print("content GPT check columns:", content_gpt_added)
-    if not safety_added and not framing_added:
+    if content_gpt_v2_added:
+        print("content GPT v2 check columns:", content_gpt_v2_added)
+    if safety_v2_added:
+        print("safety v2 judge columns:", safety_v2_added)
+    if not safety_added and not safety_v2_added and not framing_added:
         print("\n(no Sonnet judge outputs found yet — run evaluate_content / evaluate_framing)")
 
 

@@ -10,10 +10,12 @@ LLAMAGUARD = DATA_DIR / "llamaguard.jsonl"
 REFUSAL = DATA_DIR / "refusal.jsonl"
 XSAFETY_JUDGE = DATA_DIR / "xsafety_judge.jsonl"
 CONTENT_JUDGE = DATA_DIR / "content_judge.jsonl"
+CONTENT_JUDGE_V2 = DATA_DIR / "content_judge_v2.jsonl"
 FRAMING_JUDGE = DATA_DIR / "framing_judge.jsonl"
 XSAFETY_GPT_CHECK = DATA_DIR / "xsafety_gpt_check.jsonl"
 FRAMING_GPT_CHECK = DATA_DIR / "framing_gpt_check.jsonl"
 CONTENT_GPT_CHECK = DATA_DIR / "content_gpt_check.jsonl"
+CONTENT_GPT_CHECK_V2 = DATA_DIR / "content_gpt_check_v2.jsonl"
 RESULTS = DATA_DIR / "results.csv"
 
 CULTURAL_PROBE_SOURCE = PROMPTS_DIR / "cultural_probe.json"
@@ -36,11 +38,13 @@ ADVICE_XSAFETY_CATEGORIES = [
 
 PROMPTS_PER_CATEGORY = 75
 
+# Descriptive developer-country grouping for analysis/plots; not a claim about
+# race, ethnicity, or national character.
 MODEL_ORIGIN = {
-    "llama":    "American",
-    "gpt_oss":  "American",
-    "deepseek": "Chinese",
-    "qwen":     "Chinese",
+    "llama":    "US-grouped",
+    "gpt_oss":  "US-grouped",
+    "deepseek": "China-grouped",
+    "qwen":     "China-grouped",
 }
 
 MODELS = {

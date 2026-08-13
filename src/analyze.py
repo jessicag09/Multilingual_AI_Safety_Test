@@ -11,19 +11,19 @@ DIRECT_HARM_XSAFETY_CATEGORIES = {
     "Unsafe_Instruction_Topic",
 }
 MODEL_ORDER = list(config.MODEL_ORIGIN.keys())
-ORIGIN_ORDER = ["American", "Chinese"]
+ORIGIN_ORDER = ["US-grouped", "China-grouped"]
 PROMPT_ORIGIN_ORDER = ["US", "CN"]
 XSAFETY_SLICE_ORDER = ["advice_style", "direct_harm"]
 MODEL_LABELS = {
-    "llama": "Llama (US)",
-    "gpt_oss": "gpt-oss (US)",
-    "deepseek": "DeepSeek (CN)",
-    "qwen": "Qwen (CN)",
+    "llama": "Llama",
+    "gpt_oss": "gpt-oss",
+    "deepseek": "DeepSeek",
+    "qwen": "Qwen",
 }
 AXIS_LABELS = {
     "model": "model",
-    "origin": "model origin",
-    "origin_culture": "prompt origin",
+    "origin": "developer-country grouping",
+    "origin_culture": "prompt setting",
     "xsafety_slice": "xsafety slice",
 }
 
@@ -204,7 +204,7 @@ def main():
     if has_xsafety and base_cols:
         xs = df[df["stimulus_set"] == "xsafety"]
 
-        print("\n== [XSafety] ORIGIN x LANGUAGE (American vs Chinese) ==")
+        print("\n== [XSafety] GROUPING x LANGUAGE (US-grouped vs China-grouped) ==")
         by_ol = xs.groupby(["origin", "language"])[base_cols].mean().round(3).reset_index()
         print(by_ol.to_string(index=False))
         by_ol.to_csv(config.DATA_DIR / "summary_xsafety_origin_x_language.csv", index=False)
@@ -221,7 +221,7 @@ def main():
                 "XSafety: Refusal rate by model x language", "xsafety_refusal_by_model_language.png")
 
         print("\n== [XSafety] WITHIN-ORIGIN CLUSTERING ==")
-        for origin in ["American", "Chinese"]:
+        for origin in ORIGIN_ORDER:
             sub = by_ml[by_ml["model"].isin([m for m, o in config.MODEL_ORIGIN.items() if o == origin])]
             print(f"\n[{origin}]")
             print(sub.to_string(index=False))
@@ -229,7 +229,7 @@ def main():
     if has_probe and base_cols:
         cp = df[df["stimulus_set"] == "cultural_probe"]
 
-        print("\n== [Cultural Probe] ORIGIN-OF-MODEL x ORIGIN-OF-PROMPT ==")
+        print("\n== [Cultural Probe] GROUPING-OF-MODEL x PROMPT-SETTING ==")
         by_oo = cp.groupby(["origin", "origin_culture"])[base_cols].mean().round(3).reset_index()
         print(by_oo.to_string(index=False))
         by_oo.to_csv(config.DATA_DIR / "summary_probe_modelorigin_x_promptorigin.csv", index=False)
@@ -333,7 +333,7 @@ def main():
                     "xsafety_slice",
                     "origin",
                     "xsafety_safe",
-                    "XSafety control: safe rate by slice x model origin",
+                    "XSafety control: safe rate by slice x developer-country grouping",
                     "xsafety_slice_origin_safe.png",
                 )
                 bar(
@@ -341,7 +341,7 @@ def main():
                     "origin",
                     "xsafety_slice",
                     "xsafety_safe",
-                    "XSafety control: safe rate by model origin x slice",
+                    "XSafety control: safe rate by developer-country grouping x slice",
                     "xsafety_origin_slice_safe_bar.png",
                 )
 
@@ -363,7 +363,7 @@ def main():
                     "xsafety_slice",
                     "origin",
                     "xsafety_unsafe",
-                    "XSafety control: xsafety_unsafe by slice x origin",
+                    "XSafety control: xsafety_unsafe by slice x grouping",
                     "xsafety_slice_origin_unsafe_heatmap.png",
                     vmin=0.0,
                     vmax=max(0.2, float(by_so["xsafety_unsafe"].max())),

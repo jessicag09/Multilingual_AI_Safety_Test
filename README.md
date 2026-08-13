@@ -1,23 +1,42 @@
 # Cross-Cultural Safety of Open-Weight LLMs for Vulnerable Adolescents
 
+> **Content note:** This repository contains first-person benchmark prompts
+> written in the voice of adolescents in distress, covering self-harm,
+> suicidal ideation, abuse, grooming, disordered eating, substance
+> peer-pressure, and related topics. These materials exist to evaluate model
+> safety. Full model transcripts are excluded (see
+> [Data availability](#data-availability)).
+
 This project evaluates how open-weight LLMs respond to **vulnerable
 adolescents in distress**. Existing child-safety benchmarks often treat the
 minor as an adversary trying to extract harmful instructions, where refusal is
 the right answer. This study focuses on the complementary case: a teenager who
 is already scared, overwhelmed, coerced, or at risk, where a hard refusal can
-itself become the failure mode.
+itself become the failure mode. The analysis is designed to distinguish
+**context-mismatch failures on ordinary help-seeking prompts** from
+**refusal-style differences on harmful-request prompts**, rather than
+collapsing both into one generic "safety" number.
 
 At the center of the study is a custom adolescent vulnerable-user benchmark:
 culturally grounded, first-person scenarios about academic-crisis despair,
 self-harm, parental abuse, disordered eating, grooming, caregiving burden, and
 more. Each prompt is written as if by a teenager in distress and paired across
-US and Chinese social settings whenever a meaningful counterpart exists.
+US and China social settings whenever a meaningful counterpart exists.
+
+This is a **user-centered study of model fit**. The core question is whether
+vulnerable adolescents in different cultural and institutional settings are
+equally well served by the advice these models provide. The cross-cultural axis
+is included because advice that looks safe in one setting can fail in another
+if it assumes the wrong language, institutions, crisis resources, or
+family/social environment.
 
 This is best treated as an **exploratory benchmark and measurement study**:
 
 - strong enough to surface patterns worth reporting
-- not strong enough to support causal claims about national model origin
-- strongest when interpreted at the **model level**, not as a clean US-vs-China causal comparison
+- not strong enough to support causal claims about developer-country grouping
+- strongest when interpreted at the **model level**, not as a clean cross-national causal comparison
+- best viewed as an **adolescent-focused first instantiation** of a broader
+  distress-response benchmark design, not the final scope of that design
 
 It measures three things, in priority order:
 
@@ -25,29 +44,52 @@ It measures three things, in priority order:
 - baseline safety on the more neutral XSafety benchmark
 - advice framing across languages and model families
 
+The empirical analysis is intentionally decomposed into three slices:
+
+- a neutralized **XSafety advice-style control** to show what standard baselines compress
+- a **non-harmful help-seeking** slice of the adolescent benchmark, which isolates escalation / localization fit
+- a **harmful-request** slice of the adolescent benchmark, which isolates refusal-style differences
+
+For cross-cultural claims, the non-harmful slice is reported in **two forms**:
+
+- the full non-harmful slice, which includes `supplemental_unpaired` prompts and therefore mixes setting with topic composition
+- a **paired-only matched-prompt robustness check**, which controls topic and is the conservative estimate of any setting effect
+
 These outcomes are analyzed across three empirical settings:
 
 - **scenario culture** — `origin_culture` (US / CN): whose situation the prompt describes
 - **prompt language** — `en` / `zh`: which language the model is asked in
-- **model grouping** — two American open-weight models (`llama`, `gpt_oss`) and two Chinese open-weight models (`deepseek`, `qwen`)
+- **model grouping** — two `US-grouped` open-weight models (`llama`, `gpt_oss`) and two `China-grouped` open-weight models (`deepseek`, `qwen`)
 
 The cross-cultural settings matter, but they are the **empirical setting**, not
 the main causal claim. Throughout, origin/group labels are descriptive only.
 With `n=2` models per group, the cleaner unit of analysis is the individual
-model.
+model. Here, the model grouping refers to the developer-country context of the
+model-building organization, not to race, ethnicity, or any national
+population.
 
 ## Design
 
 ### Model grid
 
-| Origin | Model key | Model |
+| Developer-country grouping | Model key | Model |
 |---|---|---|
-| American | `llama` | `meta-llama/Llama-3.3-70B-Instruct-Turbo` |
-| American | `gpt_oss` | `openai/gpt-oss-120b` |
-| Chinese | `deepseek` | `deepseek-ai/DeepSeek-V4-Pro` |
-| Chinese | `qwen` | `Qwen/Qwen3-235B-A22B-Instruct-2507-tput` |
+| `US-grouped` | `llama` | `meta-llama/Llama-3.3-70B-Instruct-Turbo` |
+| `US-grouped` | `gpt_oss` | `openai/gpt-oss-120b` |
+| `China-grouped` | `deepseek` | `deepseek-ai/DeepSeek-V4-Pro` |
+| `China-grouped` | `qwen` | `Qwen/Qwen3-235B-A22B-Instruct-2507-tput` |
 
 All four are served through Together AI serverless.
+
+Selection rationale:
+
+- These four models were chosen because they are **high-capability, widely
+  accessible open-weight systems** from two major development ecosystems.
+- The point is not to stage a national comparison, but to test whether salient
+  real-world sources of advice show **context-mismatch failures** for youth
+  users outside the environments they appear best adapted to.
+- We use **open-weight** rather than **open source** because the weights are
+  publicly available but the licenses are not uniform across the set.
 
 ### Languages
 
@@ -93,6 +135,18 @@ Prompt-language expansion:
 
 - `32` base prompts
 - `64` prompt-language pairs per model
+
+Analysis decomposition used in the paper:
+
+- **non-harmful help-seeking prompts**: the primary slice for testing cross-cultural escalation and context fit
+- **harmful-request prompts**: a hand-defined 6-family subset used to separate refusal-style behavior from general help-seeking behavior
+
+This split is an analysis device, not a claim that the benchmark has one
+morally self-evident partition. It is used because refusal design and
+cross-cultural escalation are different questions and should not be conflated.
+For claims about prompt-setting effects, the matched-pair portion of the
+benchmark is the cleaner causal-like comparison and should be treated as the
+primary robustness check.
 
 Topic coverage includes:
 
@@ -163,7 +217,7 @@ framing.
 | Harm classifier | `src/evaluate_llamaguard.py` | `meta-llama/Llama-Guard-4-12B` | all rows | `llamaguard_unsafe` |
 | Refusal judge | `src/evaluate_refusal.py` | `claude-haiku-4-5-20251001` | all rows | `refusal` |
 | XSafety-style judge | `src/evaluate_xsafety.py` | `claude-haiku-4-5-20251001` | all rows | `xsafety_unsafe` |
-| Adolescent safety judge | `src/evaluate_content.py` | `claude-sonnet-4-6` | `cultural_probe` by default | `overall_safe`, `facilitates_harm`, `risk_level`, etc. |
+| Adolescent safety judge | `src/evaluate_content.py` | `claude-sonnet-4-6` | `cultural_probe` by default | v1: `overall_safe`, `facilitates_harm`, `risk_level`, etc.; v2: adds `prompt_type`, `response_mode`, `resource_localization` |
 | Framing judge | `src/evaluate_framing.py` | `claude-sonnet-4-6` | all rows by default | `stance`, `individual_framing`, `collectivist_framing`, `recommendation`, `tone` |
 
 ### Cross-judge robustness checks
@@ -224,6 +278,12 @@ It scores:
 - `overall_safe`
 - `failure_notes`
 
+The v2 rubric in `evaluate_content.py --rubric-version v2` adds:
+
+- `prompt_type`
+- `response_mode`
+- `resource_localization`
+
 The rubric first distinguishes:
 
 - `distress / help-seeking`
@@ -267,31 +327,45 @@ collectivist framing, which a single scale would miss.
 | `collectivist_framing` | `1-5` numeric | degree to which advice centers family / group obligations or harmony | framing judge |
 | `response_mode` | categorical | `engaged`, `refuse_and_redirect`, or `bare_refusal` | response-data analysis (heuristic) |
 | `response_outcome` | categorical | `engaged_safe`, `refuse_and_redirect`, `bare_refusal`, or `engaged_harmful` | response-data analysis (heuristic) |
-| `language_adherence` | numeric / binary summary | whether a Chinese prompt is actually answered in Chinese | response-data analysis |
+| `language_adherence` | numeric / binary summary | whether a `zh` prompt is actually answered in `zh` | response-data analysis |
 | `resource_localization` | binary summary | whether crisis resources match the prompt language / setting | response-data analysis (heuristic) |
+| `prompt_type` (`v2`) | categorical | `distress`, `harmful_request`, or `normalization_probe` | adolescent safety judge v2 |
+| `response_mode` (`v2`) | categorical | `engaged`, `refuse_and_redirect`, or `bare_refusal` | adolescent safety judge v2 |
+| `resource_localization` (`v2`) | categorical | `appropriate`, `mismatched`, `none_offered`, or `not_applicable` | adolescent safety judge v2 |
 
 ## Research questions
 
-1. Does a **distress-context adolescent benchmark** reveal failure modes that
-   adversarial / refusal-oriented baselines blur or miss?
-2. Do culturally grounded adolescent prompts reveal patterns that are weaker or
-   hidden on neutralized XSafety prompts?
-3. Do the same models respond differently in English and Chinese on the
+1. Are vulnerable adolescents in different cultural and institutional settings
+   **equally well served** by open-weight LLMs in distress scenarios?
+2. What **context-mismatch failures** appear when a model's advice does not fit
+   the user's language, institutions, crisis resources, or social environment?
+3. Do the same models respond differently in English and `zh` on the
    adolescent benchmark and the XSafety control?
 4. When responses are safe or unsafe, how do refusal style, engagement, and
    framing vary across scenario culture, language, and model family?
-5. Descriptively, do the two American open-weight models and two Chinese
-   open-weight models cluster differently on these measures?
+5. Descriptively, do models from two major developer-country ecosystems show
+   different patterns on these user-fit measures?
 
 ## Scope constraints
 
 - `n=2` models per descriptive origin grouping means origin-level differences
   are exploratory; model-level comparisons are the cleaner unit.
+- the descriptive grouping is about developer-country context, not race,
+  ethnicity, or a claim about entire national populations.
 - model grouping is not cleanly separable from model-family, capability, and
   alignment-cohort effects.
+- one plausible mechanism is differential exposure to local-language user text,
+  local institutions, and local advice norms during training or post-training,
+  but this study does not identify that mechanism directly.
 - the adolescent benchmark is custom and exploratory rather than a field
   standard.
-- Chinese prompts should ideally receive native-speaker review before strong
+- explicit ages are a deliberate part of the current benchmark design, but a
+  useful follow-up would be to rerun age-removed prompt variants to estimate
+  how much minor-status disclosure affects behavior.
+- a second useful follow-up would be to create more universalized prompt
+  variants with less culture-specific grounding, to separate age effects,
+  cultural-setting effects, and distress-framing effects more cleanly.
+- `zh` prompts should ideally receive native-speaker review before strong
   external claims are made.
 - the safety and framing judgments come from LLM evaluators rather than human
   review labels.
@@ -302,10 +376,59 @@ collectivist framing, which a single scale would miss.
 - the study does not support causal attribution to any specific training,
   policy, or regulatory mechanism.
 
+## Data availability
+
+Full model transcripts are omitted from the public repository because some
+contain unsafe completions to simulated-minor distress prompts; they are
+available to researchers on request. The repository keeps aggregate summary
+CSVs, judge-score tables, and figures.
+
+BENCHMARK DATA - DO NOT TRAIN - canary UUID
+`be77aa0d-fea0-44f3-a7a0-b39876199939`. This canary string also appears in
+`prompts/cultural_probe.json`; its presence in a model's output indicates the
+benchmark leaked into training data.
+
+## Presentation
+
+A slide deck summarizing the study — background, benchmark design, workflow,
+and key findings (refusal-style separation on the cultural probe,
+crisis-resource mismatch, and language adherence) — is available at
+[`docs/presentation.pdf`](docs/presentation.pdf). It was prepared for the NSF
+CyberTraining program with Maithili Bhoop and Jannatun Noor Sameera.
+
+## Author
+
+Jessica Gravel — study design, benchmark construction, generation and
+evaluation pipeline, analysis.
+
+## Collaborators
+
+This project began as a group effort at the NSF CyberTraining bootcamp
+(May 2026). Maithili Bhoop contributed refinements to the content-analyzer
+rubric; Jannatun Noor Sameera suggested the focus on AI empathy that shaped
+the benchmark's direction.
+
 ## Contribution
 
-The contribution is mainly empirical:
+The contribution is primarily **benchmark and measurement design, demonstrated
+empirically**:
 
 - a cleaned XSafety baseline
-- a custom adolescent vulnerable-user benchmark
+- a custom adolescent vulnerable-user benchmark with matched US/CN prompt
+  structure plus culture-bound supplementals
+- a decomposition of that benchmark into **non-harmful help-seeking** and
+  **harmful-request** slices so cross-cultural escalation effects can be
+  separated from refusal-style effects
+- a layered evaluator stack: composite safety judge, framing judge, and a
+  reproducible response-data audit that exposes response mode, localization,
+  and language failures
 - a safety/framing split that makes the analysis more interpretable
+- a user-centered framing that treats cross-cultural differences as
+  **service-quality and context-fit questions**, not as a national leaderboard
+- a four-model demonstration showing that this benchmark surfaces failures that
+  the neutralized control benchmark compresses
+
+## License
+
+Code, benchmark prompts, and aggregate data are released under the
+[MIT License](LICENSE).

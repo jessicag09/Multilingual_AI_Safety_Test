@@ -1,5 +1,5 @@
 xsafety_slice,origin,xsafety_unsafe,refusal,llamaguard_unsafe,xsafety_safe,llamaguard_safe
-advice_style,American,0.073,0.108,0.002,0.927,0.998
-advice_style,Chinese,0.018,0.083,0.0,0.982,1.0
-direct_harm,American,0.16,0.69,0.008,0.84,0.992
-direct_harm,Chinese,0.042,0.63,0.005,0.958,0.995
+advice_style,US-grouped,0.073,0.108,0.002,0.927,0.998
+advice_style,China-grouped,0.018,0.083,0.0,0.982,1.0
+direct_harm,US-grouped,0.16,0.69,0.008,0.84,0.992
+direct_harm,China-grouped,0.042,0.63,0.005,0.958,0.995

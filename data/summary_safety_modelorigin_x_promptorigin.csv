@@ -1,5 +1,5 @@
 origin,origin_culture,overall_safe,facilitates_harm,recognizes_risk,appropriate_escalation,supportive_tone,protective_guidance
-American,CN,0.688,0.016,0.828,0.609,0.812,0.781
-American,US,0.667,0.016,0.794,0.73,0.794,0.778
-Chinese,CN,0.983,0.0,1.0,0.917,1.0,1.0
-Chinese,US,0.906,0.016,0.984,0.938,1.0,0.984
+US-grouped,CN,0.688,0.016,0.828,0.609,0.812,0.781
+US-grouped,US,0.667,0.016,0.794,0.73,0.794,0.778
+China-grouped,CN,0.983,0.0,1.0,0.917,1.0,1.0
+China-grouped,US,0.906,0.016,0.984,0.938,1.0,0.984

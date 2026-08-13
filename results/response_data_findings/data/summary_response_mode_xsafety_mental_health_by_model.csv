@@ -1,0 +1,5 @@
+model,engaged,refuse_and_redirect,bare_refusal
+deepseek,1.0,0.0,0.0
+qwen,1.0,0.0,0.0
+llama,1.0,0.0,0.0
+gpt_oss,1.0,0.0,0.0
