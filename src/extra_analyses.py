@@ -57,9 +57,7 @@ CAVEAT_FIGS = ["01_adolescent_safety_by_model.png",
                "02_adolescent_safety_origin_x_prompt.png",
                "07_safety_components_by_origin.png"]
 CAVEAT_LINES = [
-    "Caveat: overall_safe is tone-sensitive. It scores ~half of CORRECT refuse-and-redirect",
-    "responses 'unsafe' and all bare refusals 'unsafe'. Read with response_mode (fig 08/10)",
-    "and facilitates_harm. See results.md.",
+    "Note: 'unsafe' includes unhelpful refusals, not just harmful content — see figs 08/10 and results.md.",
 ]
 FONT_PATH = os.path.join(matplotlib.get_data_path(), "fonts/ttf/DejaVuSans.ttf")
 

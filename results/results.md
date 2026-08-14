@@ -63,7 +63,7 @@ classifier `Llama-Guard`. Part 2 is different: it is the audit layer backed by
 
 Underlying CSVs: `evaluator_data/` (judge findings) and `response_data_findings/data/` (response-data findings).
 Reproduce the evaluator figures (01–07) with `python -m src.build_evaluator_figures` and the response-data
-findings (figures 08–13, plus the tone caveat stamped on 01/02/07) with `python -m src.extra_analyses`.
+findings (figures 08–13, plus the caveat banner stamped on 01/02/07) with `python -m src.extra_analyses`.
 
 ---
 
@@ -171,7 +171,7 @@ classifier.
 
 `overall_safe` on the adolescent benchmark, by model × language. `DeepSeek` and `Qwen` score highest on
 this composite, `gpt_oss` is middle, `Llama` lowest; English is usually a bit safer than `zh`. (The
-caveat banner notes `overall_safe` is tone-sensitive — see fig 07 and Part 2.)
+caveat banner notes that "unsafe" includes unhelpful refusals, not just harmful content — see fig 07 and Part 2.)
 
 ### 02 — Safety sub-scores by grouping × prompt setting
 ![](figures/02_adolescent_safety_origin_x_prompt.png)
