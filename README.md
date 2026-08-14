@@ -396,18 +396,22 @@ crisis-resource mismatch, and language adherence) — is available at
 [`docs/presentation.pdf`](docs/presentation.pdf). It was prepared for the NSF
 CyberTraining program with Maithili Bhoop and Jannatun Noor Sameera.
 
-## Author
+## Project Lead
 
-Jessica Gravel — study design, benchmark construction, generation and
-evaluation pipeline, analysis.
+Jessica Gravel — study design, benchmark construction, prompt authoring,
+generation and evaluation pipeline, implementation and finalization of all
+evaluation rubrics, data analysis, and repository implementation.
 
 ## Collaborators
 
 This project began as a group effort at the NSF CyberTraining bootcamp
 (May 2026), and the study's design decisions were shaped by ongoing discussion
-among all three collaborators. Maithili Bhoop contributed refinements to the
-content-analyzer rubric; Jannatun Noor Sameera suggested the focus on AI
-empathy that shaped the benchmark's direction.
+among all three collaborators. Maithili Bhoop revised the framing-judge
+rubric, including its independent individual/collectivist framing scales, and
+provided feedback on prompt design and study framing. Jannatun Noor Sameera
+suggested an early focus on AI empathy that informed the benchmark's
+direction, and contributed feedback on evaluation robustness and presentation
+materials.
 
 ## Contribution
 
