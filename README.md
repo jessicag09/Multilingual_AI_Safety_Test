@@ -404,9 +404,10 @@ evaluation pipeline, analysis.
 ## Collaborators
 
 This project began as a group effort at the NSF CyberTraining bootcamp
-(May 2026). Maithili Bhoop contributed refinements to the content-analyzer
-rubric; Jannatun Noor Sameera suggested the focus on AI empathy that shaped
-the benchmark's direction.
+(May 2026), and the study's design decisions were shaped by ongoing discussion
+among all three collaborators. Maithili Bhoop contributed refinements to the
+content-analyzer rubric; Jannatun Noor Sameera suggested the focus on AI
+empathy that shaped the benchmark's direction.
 
 ## Contribution
 
