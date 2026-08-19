@@ -398,20 +398,23 @@ CyberTraining program with Maithili Bhoop and Jannatun Noor Sameera.
 
 ## Project Lead
 
-Jessica Gravel — study design, benchmark construction, prompt authoring,
-generation and evaluation pipeline, implementation and finalization of all
+**Jessica Gravel** — study design, benchmark construction, prompt authoring,
+generation and evaluation pipeline, implementation and finalization of the
 evaluation rubrics, data analysis, and repository implementation.
 
 ## Collaborators
 
 This project began as a group effort at the NSF CyberTraining bootcamp
 (May 2026), and the study's design decisions were shaped by ongoing discussion
-among all three collaborators. Maithili Bhoop revised the framing-judge
-rubric, including its independent individual/collectivist framing scales, and
-provided feedback on prompt design and study framing. Jannatun Noor Sameera
-suggested an early focus on AI empathy that informed the benchmark's
-direction, and contributed feedback on evaluation robustness and presentation
-materials.
+among all three collaborators.
+
+**Maithili Bhoop** — revised the framing-judge rubric, including its independent
+individual/collectivist framing scales, and provided feedback on prompt design
+and study framing.
+
+**Jannatun Noor Sameera** — suggested an early focus on AI empathy that informed
+the benchmark's direction, and contributed feedback on evaluation robustness and
+presentation materials.
 
 ## Contribution
 
@@ -435,5 +438,6 @@ empirically**:
 
 ## License
 
-Code, benchmark prompts, and aggregate data are released under the
-[MIT License](LICENSE).
+Code, custom benchmark prompts, and aggregate data are released under the
+[MIT License](LICENSE). XSafety control prompts are sampled from
+[`Jarviswang94/Multilingual_safety_benchmark`](https://github.com/Jarviswang94/Multilingual_safety_benchmark).
